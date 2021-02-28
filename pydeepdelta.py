@@ -1,8 +1,9 @@
 """
-    pyDeepDelta.py - A Python/TensorFlow module for epistemic uncertainty 
-    approximation in deep learning classication models, as described in the 
-    paper "On the Delta Method for Epistemic Uncertainty Approximation in 
-    Deep Learning Classification" found at: https://arxiv.org/abs/1912.00832
+    pyDeepDelta.py - A Python/TensorFlow module for predictive epistemic 
+    uncertainty  quantification in deep learning classication models, as 
+    described in the paper "Epistemic Uncertainty Quantification in Deep 
+    Learning Classification by the Delta Method" found at: 
+    https://arxiv.org/abs/1912.00832
      
     Copyright (c) 2018-2021 by Geir K. Nilsen (geir.kjetil.nilsen@gmail.com)
     and the University of Bergen.
@@ -36,8 +37,8 @@ import pdb
 from sklearn.decomposition import IncrementalPCA
 
 class DeepDelta(object):
-    """ Implements the Delta Method for Epistemic Uncertainty Approximation in 
-        Deep Learning Classification as described in the paper found at
+    """ Implements the Delta Method for Epistemic Uncertainty Quantification 
+        in Deep Learning Classification as described in the paper found at
         https://arxiv.org/abs/1912.00832
        
         Public Attributes:
