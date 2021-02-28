@@ -1,0 +1,2 @@
+model_checkpoint_path: "model_rseed_0_num_steps_90000_reg_lambda_0.01.ckpt"
+all_model_checkpoint_paths: "model_rseed_0_num_steps_90000_reg_lambda_0.01.ckpt"
