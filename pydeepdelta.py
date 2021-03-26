@@ -1,9 +1,8 @@
 """
-    pyDeepDelta.py - A Python/TensorFlow module for predictive epistemic 
-    uncertainty  quantification in deep learning classication models, as 
-    described in the paper "Epistemic Uncertainty Quantification in Deep 
-    Learning Classification by the Delta Method" found at: 
-    https://arxiv.org/abs/1912.00832
+    pyDeepDelta.py - A Python/TensorFlow module for epistemic uncertainty 
+    approximation in deep learning classication models, as described in the 
+    paper "On the Delta Method for Epistemic Uncertainty Approximation in 
+    Deep Learning Classification" found at: https://arxiv.org/abs/1912.00832
      
     Copyright (c) 2018-2021 by Geir K. Nilsen (geir.kjetil.nilsen@gmail.com)
     and the University of Bergen.
@@ -37,8 +36,8 @@ import pdb
 from sklearn.decomposition import IncrementalPCA
 
 class DeepDelta(object):
-    """ Implements the Delta Method for Epistemic Uncertainty Quantification 
-        in Deep Learning Classification as described in the paper found at
+    """ Implements the Delta Method for Epistemic Uncertainty Approximation in 
+        Deep Learning Classification as described in the paper found at
         https://arxiv.org/abs/1912.00832
        
         Public Attributes:
@@ -177,7 +176,7 @@ class DeepDelta(object):
         self._batched_F_op = None
         self._G_op = None
         self._H_op = None
-        self._C_op = None
+        self._J_op = None
         self._batched_var_Sandwich_op = None
         self._model_fun = model_fun
         self._cost_fun = cost_fun
@@ -625,8 +624,10 @@ class DeepDelta(object):
         
         self._Lambda_G = tf.constant(Lambda, dtype='float32')
         if Q is not None:
-            self._Q_G_init = tf.placeholder(tf.float32, shape=(self.layers_P, self.K))
-            self._Q_G = tf.Variable(self._Q_G_init, dtype='float32')
+            if self._Q_G_init is None:
+                self._Q_G_init = tf.placeholder(tf.float32, shape=(self.layers_P, self.K))
+            if self._Q_G is None:
+                self._Q_G = tf.Variable(self._Q_G_init, dtype='float32')
             self.tfsession.run(self._Q_G.initializer, feed_dict={self._Q_G_init: Q})
         return
       
@@ -769,7 +770,7 @@ class DeepDelta(object):
     
 
 
-    def get_C_op(self):
+    def get_J_op(self):
         """ 
         Implements an op for the Jacobian of the data-dependent part of the cost
         function. 
@@ -777,7 +778,7 @@ class DeepDelta(object):
             None
         
         Returns:
-            ndarray of shape (batch_size_G, P)
+            tensor of shape (batch_size_G, P)
         """
                        
         ex_params = [[tf.identity(_params) \
@@ -798,8 +799,8 @@ class DeepDelta(object):
                                                                     for l in range(len(self.layers))]
                                                         for y in x]))
                              for ex in range(self.batch_size_G)])
-        self._C_op = ex_grads / self.batch_size_G
-        return self._C_op
+        self._J_op = ex_grads
+        return self._J_op
 
 
     def compute_eig_G(self, progress=True):
@@ -828,24 +829,24 @@ class DeepDelta(object):
         ipca = IncrementalPCA(n_components=self.K, batch_size=self.batch_size_G*N, 
                               copy=False)
 
-        if self._C_op is None:
-            self._C_op = self.get_C_op()
+        if self._J_op is None:
+            self._J_op = self.get_J_op()
         
         print('Starting Incremental SVD...', flush=True)
         
         
-        C = np.zeros((self.batch_size_G*N, self.layers_P), dtype='float32')
+        J = np.zeros((self.batch_size_G*N, self.layers_P), dtype='float32')
         B = int(self.N_train/self.batch_size_G)
         for b in self._progress(range(B), progress):
-            C[self.batch_size_G*(b%N):self.batch_size_G*(b%N+1),:] = self.tfsession.run(self._C_op, 
+            J[self.batch_size_G*(b%N):self.batch_size_G*(b%N+1),:] = self.tfsession.run(self._J_op, 
                                                                                         feed_dict={self.X:self.X_train[b*self.batch_size_G: \
                                                                                                                        (b+1)*self.batch_size_G], 
                                                                                                    self.y:self.y_train[b*self.batch_size_G: \
                                                                                                                        (b+1)*self.batch_size_G]})
-            if (b+1) % N == 0 and b != 0:
-                ipca.partial_fit(C)
+            if (b+1) % N == 0:
+                ipca.partial_fit(J)
                 
-        return np.float32(ipca.singular_values_**2 / (self.N_train/(self.batch_size_G)**2)) \
+        return np.float32(ipca.singular_values_**2 / self.N_train) \
                + self.reg_lambda_val, np.float32(ipca.components_.T)
                                                               
 
@@ -1214,15 +1215,10 @@ class DeepDelta(object):
 
         Kinds = self._init_Kinds(K)
 
-        print(Kinds)
-
         if full_rank is True:
             _lambda_H_gap_inv = (nLambda_H**-1 + pLambda_H**-1)/2.0
         else:
             _lambda_H_gap_inv = 0.0
-
-        print(pLambda_H)
-        print(nLambda_H)
                             
         if self._batched_var_H_op is None:
             self._batched_var_H_op = self.get_batched_var_H_op()
