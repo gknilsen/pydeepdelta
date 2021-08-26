@@ -6,6 +6,8 @@ pydeepdelta.py: A Python/TensorFlow module for predictive uncertainty quantifica
 
 pydeepdelta_demo.ipynb: A demo Jupyter notebook showing how to apply the pyDeepDelta module on a LetNet-based convolutional neural network MNIST classifier.
 
+pydeepdelta_sampler_demo.ipynb: A demo jupyter notebook showing how to combine the standard Laplace approximation with the key ideas from the paper. Hence, resulting in an efficient Laplace Approximation based Monte Carlo sampling algorithm.
+
 utils.py: Helper functions
 
 data/Lambda_G_rseed_0_layers_2wb-3wb-4wb-5wb-6wb_K_600_num_steps_90000_reg_lambda_0.01.npy: Pre-calculated OPG eigenvalues for K=600. 
