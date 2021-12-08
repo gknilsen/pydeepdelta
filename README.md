@@ -8,6 +8,8 @@ pydeepdelta_demo.ipynb: A demo Jupyter notebook showing how to apply the pyDeepD
 
 pydeepdelta_sampler_demo.ipynb: A demo jupyter notebook showing how to combine the standard Laplace approximation with the key ideas from the paper. Hence, resulting in an efficient Laplace Approximation based Monte Carlo sampling algorithm.
 
+pydeepdelta_demo_resnet18.py: A pydeepdelta demo for CIFAR-10 ResNet18.
+
 utils.py: Helper functions
 
 data/Lambda_G_rseed_0_layers_2wb-3wb-4wb-5wb-6wb_K_600_num_steps_90000_reg_lambda_0.01.npy: Pre-calculated OPG eigenvalues for K=600. 
