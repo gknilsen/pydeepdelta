@@ -4,11 +4,13 @@ This package 'pyDeepDelta' contains the following components:
 
 pydeepdelta.py: A Python/TensorFlow module for predictive uncertainty quantification in deep learning models, as described in the paper "Epistemic Uncertainty Quantification in Deep Learning Classification by the Delta Method" found at: https://arxiv.org/abs/1912.00832
 
+pydeepdelta_bn.py: Adaption of pydeepdelta.py that gets H-ops to work for architectures that have batch normalization layers.
+
 pydeepdelta_demo.ipynb: A demo Jupyter notebook showing how to apply the pyDeepDelta module on a LetNet-based convolutional neural network MNIST classifier.
 
 pydeepdelta_sampler_demo.ipynb: A demo jupyter notebook showing how to combine the standard Laplace approximation with the key ideas from the paper. Hence, resulting in an efficient Laplace Approximation based Monte Carlo sampling algorithm.
 
-pydeepdelta_demo_resnet18.py: A pydeepdelta demo for CIFAR-10 ResNet18.
+pydeepdelta_demo_resnet18.py: A pydeepdelta demo for CIFAR-10 ResNet18 using pydeepdelta_bn.py.
 
 utils.py: Helper functions
 
